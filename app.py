@@ -13,7 +13,7 @@ def home():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login.html", error = "email")
+        return render_template("Login.html", error = "email")
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["pswd"]
