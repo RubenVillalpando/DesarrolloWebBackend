@@ -65,10 +65,10 @@ def signup():
                     to="whatsapp:+5215534330756"
                 )
                 print("hasta aqui todo ok parte dos")
-                return render_template('index.html')
+                return render_template('index.html', data=session["email"])
             except Exception as e:
                 return "<h1>There was an error signing up :( ----Error = %s</h1>" % e
-        return render_template('index.html')
+        return render_template('index.html', data=session["email"])
     except Exception as e:
         return "<h1>There was an error accesing the database up :( ----Error = %s</h1>" % e
     
@@ -76,20 +76,19 @@ def signup():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if"email" in session:
+        return render_template("index.html", data = session["email"])
     email = request.form["email"]
     pswd = request.form["pswd"]
     try:
         if usersTable.find_one({"email": (email),
                                 "pswd": (pswd)}):
-            if "email" not in session:
-                if request.method == "GET":
-                    return render_template("Login.html", data = "email")
-                if request.method == "POST":
-                    email = request.form["email"]
-                    password = request.form["pswd"]
-                    return render_template("index.html", data=email)
-            else: 
-                return render_template("Login.html", data=session["email"])
+            if request.method == "GET":
+                return render_template("Login.html", data = "email")
+            if request.method == "POST":
+                email = request.form["email"]
+                password = request.form["pswd"]
+                return render_template("index.html", data=email)
         else:
             return "<h1>email o contraseña inválidos</h1>"
     except Exception as e: 
