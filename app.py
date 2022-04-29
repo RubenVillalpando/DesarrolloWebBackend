@@ -1,10 +1,8 @@
 from datetime import datetime
-from unicodedata import name
 from flask import Flask, render_template, request, session, redirect, url_for
 import datetime
 import pymongo
 from decouple import config
-from urllib.parse import quote_plus
 from twilio.rest import Client
 
 # FlASK
@@ -65,6 +63,7 @@ def signup():
                     to="whatsapp:+5215534330756"
                 )
                 print("hasta aqui todo ok parte dos")
+                session["email"] = email
                 return render_template('index.html', data=session["email"])
             except Exception as e:
                 return "<h1>There was an error signing up :( ----Error = %s</h1>" % e
@@ -76,21 +75,20 @@ def signup():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if"email" in session:
+    if "email" in session:
         return render_template("index.html", data = session["email"])
-    email = request.form["email"]
-    pswd = request.form["pswd"]
     try:
-        if usersTable.find_one({"email": (email),
+        if request.method == "GET":
+            return render_template("Login.html")
+        if request.method == "POST":
+            email = request.form["email"]
+            pswd = request.form["pswd"]
+            if usersTable.find_one({"email": (email),
                                 "pswd": (pswd)}):
-            if request.method == "GET":
-                return render_template("Login.html", data = "email")
-            if request.method == "POST":
-                email = request.form["email"]
-                password = request.form["pswd"]
+                session["email"] = email
                 return render_template("index.html", data=email)
-        else:
-            return "<h1>email o contraseña inválidos</h1>"
+            else:
+                return "<h1>email o contraseña inválidos</h1>"
     except Exception as e: 
         return "<h1>There was an error accesing the database up :( ----Error = %s</h1>" % e
     
